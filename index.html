@@ -28,7 +28,7 @@ function act(action,id){if(action==='copyquestions'){let a=appts.find(x=>x.id===
  const message=t=>{$('auth-message').textContent=t};
  const endpoint=(path)=>cfg.url.replace(/\/$/,'')+'/auth/v1/'+path;
  async function loadConfig(){
-   try{const res=await fetch('/api/config',{cache:'no-store'});if(!res.ok)throw Error('Configuration endpoint unavailable ('+res.status+').');const data=await res.json();if(!/^https:\/\/[a-z0-9.-]+\.supabase\.co$/.test(data.url||'')||!/^sb_publishable_/.test(data.publishableKey||''))throw Error('Project URL or publishable key is missing from Vercel Production environment variables.');cfg=data;message('Sign in with your Supabase account.');}
+   try{const res=await fetch('/api/config',{cache:'no-store'});if(!res.ok)throw Error('Configuration endpoint unavailable ('+res.status+').');const data=await res.json();const url=data.supabaseUrl;const publishableKey=data.supabaseKey;if(!/^https:\/\/[a-z0-9.-]+\.supabase\.co$/.test(url||'')||!/^sb_publishable_/.test(publishableKey||''))throw Error('Project URL or publishable key is missing from Vercel Production environment variables.');cfg={url,publishableKey};message('Sign in with your Supabase account.');}
    catch(e){message('Setup needed: '+e.message+' Check that the api/config.js file is deployed and Production variables are set.');$('auth-form').querySelector('button').disabled=true;}
  }
  $('auth-form').addEventListener('submit',async e=>{
