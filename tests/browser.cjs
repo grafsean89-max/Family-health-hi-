@@ -27,7 +27,7 @@ const {chromium}=require('playwright');
    await page.getByLabel('Email',{exact:true}).fill('demo@example.invalid');await page.getByLabel('Password',{exact:true}).fill('fictional-only');
    await page.getByRole('button',{name:'Sign in',exact:true}).click();await visible('main.wrap');
   };
-  await page.goto('http://127.0.0.1:3000');assert.equal(await page.locator('main.wrap').isVisible(),false);await login();
+  await page.goto((process.env.TEST_BASE_URL||'http://127.0.0.1:3000'));assert.equal(await page.locator('main.wrap').isVisible(),false);await login();
   await visible('[data-action="medication"][data-id="metformin"]');await noOverflow();
   await page.getByRole('button',{name:'Review medications',exact:true}).click();
   assert.equal(await page.locator('#medicationReview').isChecked(),true);
@@ -61,6 +61,6 @@ const {chromium}=require('playwright');
   await page.getByRole('button',{name:'Sign out',exact:true}).click();await page.getByText('Signed out.',{exact:true}).waitFor();assert.equal(await page.locator('main.wrap').isVisible(),false);
   assert.deepEqual(errors,[]);await context.close();console.log(`PASS ${viewport.width}px: medication navigation/combined filters, calendar download, mocked auth/question/checklist persistence and logout, no horizontal overflow`);
  }
- const context=await browser.newContext();await context.route('**/api/config',r=>r.fulfill({json:{supabaseUrl:'',supabaseKey:''}}));const page=await context.newPage();await page.goto('http://127.0.0.1:3000');await page.getByRole('status').filter({hasText:'Setup needed:'}).waitFor();assert.equal(await page.getByRole('button',{name:'Sign in',exact:true}).isDisabled(),true);await context.close();console.log('PASS missing-config authentication gate');
+ const context=await browser.newContext();await context.route('**/api/config',r=>r.fulfill({json:{supabaseUrl:'',supabaseKey:''}}));const page=await context.newPage();await page.goto((process.env.TEST_BASE_URL||'http://127.0.0.1:3000'));await page.getByRole('status').filter({hasText:'Setup needed:'}).waitFor();assert.equal(await page.getByRole('button',{name:'Sign in',exact:true}).isDisabled(),true);await context.close();console.log('PASS missing-config authentication gate');
  }finally{await browser.close()}
 })().catch(e=>{console.error(e);process.exit(1)});
