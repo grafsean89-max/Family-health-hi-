@@ -12,7 +12,7 @@ const {chromium}=require('playwright');
   await context.route('**/api/config',r=>r.fulfill({json:{supabaseUrl:'https://fictional-demo.supabase.co',supabaseKey:'sb_publishable_demo_only'}}));
   await context.route('https://fictional-demo.supabase.co/**',async r=>{
    const req=r.request(),url=new URL(req.url());
-   if(url.pathname.includes('/auth/v1/token'))return r.fulfill({json:{access_token:'fictional-test-token',user:{email:'demo@example.invalid'}}});
+   if(url.pathname.includes('/auth/v1/token'))return r.fulfill({json:{access_token:'fictional-test-token',refresh_token:'fictional-refresh',token_type:'bearer',expires_in:3600,user:{id:'fictional-user',email:'demo@example.invalid'}}});
    if(url.pathname.includes('/auth/v1/logout'))return r.fulfill({status:204});
    assert.equal(req.headers().authorization,'Bearer fictional-test-token');
    if(req.method()==='POST'){rows.push({id:nextId++,...req.postDataJSON()});return r.fulfill({status:201,body:''})}
@@ -55,7 +55,7 @@ const {chromium}=require('playwright');
   const custom=await page.evaluate(()=>appointmentCalendar({id:'test',date:'2026-12-31',time:'12:00 AM',doctor:'chen',reason:'Demo, semicolon; newline\n'+ 'é'.repeat(100)}));
   assert.match(custom,/DTSTART:20261231T000000/);assert.match(custom.replace(/\r\n /g,''),/Demo\\, semicolon\\; newline\\n/);for(const line of custom.split('\r\n'))assert.ok(Buffer.byteLength(line)<=75);
   assert.match(await page.evaluate(()=>appointmentCalendar(appts[1])),/DTSTART:20261105T140000/);
-  await noOverflow();await page.reload();await login();await page.locator('#nav [data-id="Appointments"]').click();await page.locator('[data-action="appointment"][data-id="a1"]').click();
+  await noOverflow();await page.reload();await visible('main.wrap');await page.locator('#nav [data-id="Appointments"]').click();await page.locator('[data-action="appointment"][data-id="a1"]').click();
   await page.locator('.checklist').getByText('1. Fictional demo question',{exact:true}).waitFor();assert.equal(await page.getByRole('checkbox',{name:'Include in checklist'}).isChecked(),true);
   await page.getByRole('button',{name:'Remove question',exact:true}).click();await page.getByText('No questions yet.',{exact:true}).waitFor();
   await page.getByRole('button',{name:'Sign out',exact:true}).click();await page.getByText('Signed out.',{exact:true}).waitFor();assert.equal(await page.locator('main.wrap').isVisible(),false);
