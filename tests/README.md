@@ -16,3 +16,7 @@ node tests/session.cjs
 Both tests intercept `/api/config` and Supabase requests. `CHROMIUM_PATH` can override the default `/usr/bin/chromium`. Install Playwright in your local development environment if it is not already available. A static server is sufficient for these tests only; running the real app requires its Vercel `/api/config` handler and existing Supabase configuration.
 
 The session suite uses and deletes a temporary Chromium profile to test actual browser close/reopen, rather than merely simulating page reload. It covers refresh-token renewal, invalid refresh tokens, the loading gate, storage cleanup, cross-tab sign-out, and question/checklist restoration. The existing suite covers medication/calendar behavior and question mutations at phone and tablet widths.
+
+Patient access Phase 1 adds `node supabase/tests/browser-family.cjs` for phone/tablet patient-mode UX and `bash supabase/tests/run.sh` for actual PostgreSQL RLS, grants, invitations, legacy import and concurrent administrator removal. See [the security and deployment guide](../docs/family-access-security.md) for the threat boundary, staging rollout, rollback and remaining limitations.
+
+All browser suites accept `TEST_BASE_URL` when a server is running on a port other than 3000.
